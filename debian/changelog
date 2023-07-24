@@ -1,0 +1,7 @@
+python3-taskscheduler (2.9.9) focal-updates; urgency=medium
+
+  * Splitted from taskscheduler
+  * Simplified cron management
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 24 Jul 2023 11:51:27 +0200
+
