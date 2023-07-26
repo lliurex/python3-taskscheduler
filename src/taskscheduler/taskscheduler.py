@@ -68,12 +68,22 @@ class TaskScheduler():
 
 	def _getRawSystemCron(self,cronF):
 		lines=[]
+		data=[]
 		if os.path.isfile(cronF):
-			with open(cronF) as f:
-				for l in f.readlines():
-					if not l.startswith("#") and len(l)>2 and len(l.split())>6:
-						lines.append(l.strip())
-		return lines
+			try:
+				with open(cronF) as f:
+					lines=f.readlines()
+			except Exception as e:
+				print(repr(e))
+				print("Reverting to taskscheduler")
+				cronF="/etc/cron.d/taskscheduler"
+				with open(cronF) as f:
+					lines=f.readlines()
+
+			for l in lines:
+				if not l.startswith("#") and len(l)>2 and len(l.split())>6:
+						data.append(l.strip())
+		return data
 	#def _getRawSystemCron
 
 	def _sortCron(self,cron,field):
@@ -229,24 +239,26 @@ class TaskScheduler():
 	#def _expandCronRegex
 
 	def cronFromJson(self,data,orig="",cronF=""):
-		if str(data.get("cmd",""))=="":
+		if len(data)==0:
+			return
+		if str(data[0].get("cmd",""))=="":
 			return
 		root=" "
 		if len(cronF)>0:
 			root=" root "
-		cron="{0} {1} {2} {3} {4}{5}{6}".format(data.get("m","*"),data.get("h","*"),data.get("dom","*"),data.get("mon","*"),data.get("dow","*"),root,data.get("cmd"))
-		if len(cronF)>0:
 			cronArray=self._getRawSystemCron(cronF)
 		else:
 			cronArray=self._getRawUserCron()
-		self._debug("Adding task to cron")
-		self._debug("{}".format(cron))
-		self._debug("_________________")
-		if cron not in cronArray:
-			cronArray.append(cron)
+		for itemdata in data:
+			cron="{0} {1} {2} {3} {4}{5}{6}".format(itemdata.get("m","*"),itemdata.get("h","*"),itemdata.get("dom","*"),itemdata.get("mon","*"),itemdata.get("dow","*"),root,itemdata.get("cmd"))
+			self._debug("Adding task to cron {}".format(cronF))
+			self._debug("{}".format(cron))
+			self._debug("_________________")
+			if cron not in cronArray:
+				cronArray.append(cron)
 		if len(orig)>0:
 			if len(cronF)>0:
-				self.removeFromSystemCron(orig,cronF,cronArray)
+				cronArray=self._filterCmdFromCronArray(orig,cronF,cronArray)
 			else:
 				self.removeFromCron(orig,cronArray)
 		if len(cronF)>0:
@@ -280,36 +292,44 @@ class TaskScheduler():
 			for line in cronArray:
 				if len(line.strip())>0:
 					fh.writelines("{}\n".format(line))
-
-		if not os.path.isfile(cronF):
-			if os.path.basename(cronF)==cronF:
-				cronF=os.path.join("/","etc","cron.d",cronF)
+		os.chmod(cronTmp,0o644 )
+		cronF=self._getCronPath(cronF)
+		cmd=["pkexec","rsync",cronTmp,cronF,"--usermap=*:root"]
 		try:
-			shutil.move(cronTmp,cronF)
-		except:
-			cmd=["pkexec","mv",cronTmp,cronF]
-			try:
-				subprocess.run(cmd)
-			except Exception as e:
-				print(repr(e))
+			subprocess.run(cmd)
+		except Exception as e:
+			print(repr(e))
+			print(cmd)
 	#def writeSystemCron
 
 	def removeFromSystemCron(self,schedcmd,cronF,cronArray=[]):
 		self._debug("Removing from system cron file {}".format(cronF))
-		if len(cronF)>0:
-			if not os.path.isfile(cronF):
-				if os.path.basename(cronF)==cronF:
-					cronF=os.path.join("/","etc","cron.d",cronF)
-			self._debug("Selected file: {}".format(cronF))
+		cronF=self._getCronPath(cronF)
+		cronArray=self._filterCmdFromCronArray(schedcmd,cronF,cronArray)
+		if os.path.isfile(cronF):
+			self.writeSystemCron(cronArray,cronF)
+		else:
+			self._debug("{} not found for remove".format(cronF))
+	#def removeFromSystemCron
+
+	def _filterCmdFromCronArray(self,schedcmd,cronF,cronArray=[]):
+		cronF=self._getCronPath(cronF)
 		if os.path.isfile(cronF):
 			if len(cronArray)==0:
 				cronArray=self._getRawSystemCron(cronF)
 			if schedcmd in cronArray:
 				self._debug(cronArray.remove(schedcmd))
-			self.writeSystemCron(cronArray,cronF)
-		else:
-			self._debug("{} not found for remove".format(cronF))
-	#def removeFromSystemCron
+		return(cronArray)
+	#def _filterCmdFromCronArray
+	
+	def _getCronPath(self,cronF):
+		if len(cronF)>0:
+			if not os.path.isfile(cronF):
+				if os.path.basename(cronF)==cronF:
+					cronF=os.path.join("/","etc","cron.d",cronF)
+			self._debug("Selected file: {}".format(cronF))
+		return(cronF)
+	#def _getCronPath
 
 #class TaskScheduler
 
