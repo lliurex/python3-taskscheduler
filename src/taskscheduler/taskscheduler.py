@@ -134,7 +134,7 @@ class TaskScheduler():
 		(nextTime,inc)=self._getNextTime(rawTime,nowTime)
 		nextTime=nextTime.zfill(4)
 		nextDate=self._getNextDate(rawDate,nowDate,inc).zfill(4)
-		compDate=nowDate.replace(":","").zfill(4)
+		compDate="{}{}".format(nowDate.split(":")[0].zfill(2),nowDate.split(":")[1].zfill(2))
 		if nextDate!=compDate:
 			(nextTime,inc)=self._getNextTime(rawTime,"0:0")
 			nextTime=nextTime.zfill(4)
