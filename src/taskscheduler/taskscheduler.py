@@ -25,7 +25,7 @@ class TaskScheduler():
 		cmdOutput=self._getRawUserCron()
 		for line in cmdOutput:
 			if not line.strip().startswith("#") and len(line.strip())>1:
-				rawCron.append(line)
+				rawCron.append(' '.join(line.split()))
 		userCron=self._parseCron(rawCron)
 		userCron=self._sortCron(userCron,"restepoch")
 		return(userCron)
@@ -82,7 +82,8 @@ class TaskScheduler():
 
 			for l in lines:
 				if not l.startswith("#") and len(l)>2 and len(l.split())>6:
-						data.append(l.strip())
+						data.append(' '.join(l.split()))
+
 		return data
 	#def _getRawSystemCron
 
@@ -231,9 +232,9 @@ class TaskScheduler():
 
 	def cronFromJson(self,data,orig="",cronF=""):
 		if len(data)==0:
-			return
+			return(False)
 		if str(data[0].get("cmd",""))=="":
-			return
+			return(False)
 		root=" "
 		if len(cronF)>0:
 			root=" root "
@@ -256,6 +257,7 @@ class TaskScheduler():
 			self.writeSystemCron(cronArray,cronF)
 		else:
 			self.writeCron(cronArray)
+		return(True)
 	#def cronFromJson
 
 	def writeCron(self,cronArray):
@@ -322,5 +324,82 @@ class TaskScheduler():
 		return(cronF)
 	#def _getCronPath
 
+	def getAt(self):
+		lines=[]
+		dictTaskId={}
+		cmd="atq"
+		cmdOutput=subprocess.check_output(cmd).decode()
+		days=["mon","tue","wed","thu","fri","sat","sun"]
+		months=["gen","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+		for line in cmdOutput.split("\n"):
+			line=' '.join(line.split())
+			if len(line)>0:
+				#[0]=id [1]=Dow [2]=Mon [3]=Dom [4]=h:m:s [5]=y [6]=at queue [7]=user
+				data=line.split()
+				atid=data[0]
+				cmd=self._getCmdForAtTask(atid)
+				dow=days.index(data[1].lower())
+				mon=months.index(data[2].lower())+1
+				dom=data[3]
+				h=data[4].split(":")[0]
+				m=data[4].split(":")[1]
+				lines.append("{0} {1} {2} {3} * {4}".format(m,h,dom,mon,cmd))
+				raw="{0}{1}{2}{3}*{4}".format(m,h,dom,mon,cmd)
+				raw=raw.replace(" ","")
+				dictTaskId[raw]=atid
+		userAt=self._parseCron(lines)
+		for key,task in userAt.items():
+			raw=task.get("raw").replace(" ","")
+			atid=dictTaskId.get(raw,"not found")
+			task['atid']=atid
+		userAt=self._sortCron(userAt,"restepoch")
+		return(userAt)
+	#def getAt(self)
+
+	def _getCmdForAtTask(self,atid):
+		task="AT Index: {}".format(atid)
+		cmd=["at","-c",atid]
+		cmdOutput=[]
+		try:
+			cmdOutput=str(subprocess.check_output(cmd).decode()).split("\n")
+		except:
+			print("TaskID: {} error getting cmd".format(atid))
+		else:
+			try:
+				pos=cmdOutput.index("}")
+			except:
+				print("TaskID: {} error getting cmd".format(atid))
+				print("POS: {}".format(pos))
+			else:
+				task=" ".join(cmdOutput[pos+1:])
+		return(task)
+	#def _getCmdForAtTask
+
+	def removeFromAt(self,atid):
+		cmd=["atrm",atid]
+		subprocess.run(cmd)
+	#def removeFromAt
+
+	def addAtJob(self,m,h,dom,mon,task):
+		ret=True
+		now=datetime.datetime.now()
+		year=now.year
+		schedTime="{}{}{}{}".format(str(mon).zfill(2),str(dom).zfill(2),str(h).zfill(2),str(m).zfill(2))
+		nowTime="{}{}{}{}".format(str(now.month).zfill(2),str(now.day).zfill(2),str(now.hour).zfill(2),str(now.minute).zfill(2))
+		if schedTime<=nowTime:
+			year+=1
+		#If we want to have a command name then we must schedule it through echo and pipe
+		cmd=["at","{}:{}".format(str(h).zfill(2),str(m).zfill(2)),"{}.{}.{}".format(dom,mon,year)]
+		try:
+			cmdEcho = subprocess.Popen(('echo', task), stdout=subprocess.PIPE)
+		except:
+			ret=False
+		try:
+			output = subprocess.check_output(cmd, stdin=cmdEcho.stdout)
+		except:
+			ret=False
+		cmdEcho.wait()
+		return(ret)
+	#def addToAt
 #class TaskScheduler
 
