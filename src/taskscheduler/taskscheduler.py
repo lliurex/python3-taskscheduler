@@ -303,7 +303,6 @@ class TaskScheduler():
 			self._debug("{} not found for remove".format(cronF))
 	#def removeFromSystemCron
 
-
 	def _filterCmdFromCronArray(self,schedcmd,cronF,cronArray=[]):
 		cronF=self._getCronPath(cronF)
 		if os.path.isfile(cronF):
