@@ -198,15 +198,25 @@ class TaskScheduler():
 		return(str(nextDate))
 	#def _getNextDate
 
-	def _expandCronRegex(self,raw,expandglob=0,expandglob2=0,first=0,now=0):
+	def _expandCronRegex(self,raw,last=0,last2=0,first=0,now=0):
 		(data1,data2)=raw.split(":")
 		now1=first
 		now2=first
 		if not(isinstance(now,int)):
 			(now1,now2)=now.split(":")
+
+		selectedData=self._processCronField(data1,first,last,current=now1)
 		lines=[]
+		for data in selectedData:
+			selectedData2=self._processCronField(data2,first,last2)
+			for item in selectedData2:
+				lines.append(int("{0}{1}".format(data.zfill(2),str(item).zfill(2))))
+		return(lines)
+	#def _expandCronRegex
+
+	def _processCronField(self,cronData,first,last,current=-1):
 		selectedData=[]
-		for data in data1.split(","):
+		for data in cronData.split(","):
 			if "-" in data:
 				rangedata=data.split("-")
 				for i in range(int(rangedata[0]),int(rangedata[-1])+1):
@@ -214,29 +224,10 @@ class TaskScheduler():
 			elif data.isdigit():
 				selectedData.append(data)
 			elif data=="*":
-				for i in range(first,int(expandglob)+first):
+				for i in range(first,int(last)+first):
 					selectedData.append(str(i))
-			if int(now1)+3>len(selectedData):
-				tempData=selectedData
-				for i in selectedData:
-					tempData.append(i)
-					if len(tempData)>=3:
-						break
-				selectedData=tempData
-				
-		for data in selectedData:
-			for item in data2.split(","):
-				if "-" in item:
-					rangeitem=item.split("-")
-					for i in range(int(rangeitem[0]),int(rangeitem[-1])+1):
-						lines.append(int("{0}{1}".format(data,str(i).zfill(2))))
-				elif item.isdigit():
-					lines.append(int("{0}{1}".format(data,str(item).zfill(2))))
-				elif item=="*":
-					for i in range(first,int(expandglob2)):
-						lines.append(int("{0}{1}".format(data,str(i).zfill(2))))
-		return(lines)
-	#def _expandCronRegex
+		return (selectedData)
+	#def _processCronField
 
 	def cronFromJson(self,data,orig="",cronF=""):
 		if len(data)==0:
@@ -267,15 +258,6 @@ class TaskScheduler():
 			self.writeCron(cronArray)
 	#def cronFromJson
 
-	def removeFromCron(self,schedcmd,cronArray=[]):
-		self._debug("Removing from user cron")
-		if len(cronArray)==0:
-			cronArray=self._getRawUserCron()
-		if schedcmd in cronArray:
-			self._debug(cronArray.remove(schedcmd))
-		self.writeCron(cronArray)
-	#def removeFromCron
-
 	def writeCron(self,cronArray):
 		(f,cronFile)=tempfile.mkstemp()
 		with open(cronFile,"w") as fh:
@@ -302,6 +284,15 @@ class TaskScheduler():
 			print(cmd)
 	#def writeSystemCron
 
+	def removeFromCron(self,schedcmd,cronArray=[]):
+		self._debug("Removing from user cron")
+		if len(cronArray)==0:
+			cronArray=self._getRawUserCron()
+		if schedcmd in cronArray:
+			self._debug(cronArray.remove(schedcmd))
+		self.writeCron(cronArray)
+	#def removeFromCron
+
 	def removeFromSystemCron(self,schedcmd,cronF,cronArray=[]):
 		self._debug("Removing from system cron file {}".format(cronF))
 		cronF=self._getCronPath(cronF)
@@ -311,6 +302,7 @@ class TaskScheduler():
 		else:
 			self._debug("{} not found for remove".format(cronF))
 	#def removeFromSystemCron
+
 
 	def _filterCmdFromCronArray(self,schedcmd,cronF,cronArray=[]):
 		cronF=self._getCronPath(cronF)
