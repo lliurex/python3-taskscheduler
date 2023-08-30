@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 #
-# $Id: setup.py,v 1.32 2010/10/17 15:47:21 ghantoos Exp $
-#
-#    Copyright (C) 2008-2009  Ignace Mouzannar (ghantoos) <ghantoos@ghantoos.org>
-#
-#    This file is part of lshell
+#    Copyright (C) 2023 LliureX Team 
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
