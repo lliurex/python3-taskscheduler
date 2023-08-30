@@ -37,7 +37,7 @@ if __name__ == '__main__':
         data_files = [],
         classifiers=[
                 'Development Status :: 4 - Beta',
-                'Environment :: Console'
+                'Environment :: Desktop'
                 'Intended Audience :: End Users',
                 'License :: OSI Approved :: GNU General Public License v3',
                 'Operating System :: POSIX',
