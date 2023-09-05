@@ -10,7 +10,7 @@ Homepage: http://lliurex.net
 
 Package: python3-taskscheduler
 Architecture: all
-Depends: ${python3:Depends},python3
+Depends: ${python3:Depends},python3,at
 Description: Python3 module for cron
 Conflicts: taskscheduler (<< 2.4.9)
 Breaks: taskscheduler (<< 2.4.9)
