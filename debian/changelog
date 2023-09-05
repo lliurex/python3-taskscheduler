@@ -1,4 +1,4 @@
-python3-taskscheduler (2.9.9) focal-updates; urgency=medium
+python3-taskscheduler (3.0) jammy; urgency=medium
 
   * Splitted from taskscheduler
   * Simplified cron management
