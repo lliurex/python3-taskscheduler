@@ -1,4 +1,4 @@
-python3-taskscheduler (3.0) jammy; urgency=medium
+python3-taskscheduler (3.0-0lliurex) jammy; urgency=medium
 
   * Splitted from taskscheduler
   * Simplified cron management
