@@ -1,3 +1,9 @@
+python3-taskscheduler (3.0.1-0lliurex23) jammy; urgency=medium
+
+  * Fix string "jan" in list of months
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 25 Jan 2024 10:58:42 +0100
+
 python3-taskscheduler (3.0-0lliurex) jammy; urgency=medium
 
   * Splitted from taskscheduler
