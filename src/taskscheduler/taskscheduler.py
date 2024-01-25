@@ -330,7 +330,7 @@ class TaskScheduler():
 		cmd="atq"
 		cmdOutput=subprocess.check_output(cmd).decode()
 		days=["mon","tue","wed","thu","fri","sat","sun"]
-		months=["gen","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+		months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
 		for line in cmdOutput.split("\n"):
 			line=' '.join(line.split())
 			if len(line)>0:
