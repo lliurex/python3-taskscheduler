@@ -1,3 +1,9 @@
+python3-taskscheduler (3.1.0-0lliurex23) jammy; urgency=medium
+
+  * Add return status for cronfromjson
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 26 Jan 2024 11:27:23 +0100
+
 python3-taskscheduler (3.0.1-0lliurex23) jammy; urgency=medium
 
   * Fix string "jan" in list of months
