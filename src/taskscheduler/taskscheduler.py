@@ -231,10 +231,11 @@ class TaskScheduler():
 	#def _processCronField
 
 	def cronFromJson(self,data,orig="",cronF=""):
+		ret=False
 		if len(data)==0:
-			return(False)
+			return(ret)
 		if str(data[0].get("cmd",""))=="":
-			return(False)
+			return(ret)
 		root=" "
 		if len(cronF)>0:
 			root=" root "
@@ -254,23 +255,33 @@ class TaskScheduler():
 			else:
 				self.removeFromCron(orig,cronArray)
 		if len(cronF)>0:
-			self.writeSystemCron(cronArray,cronF)
+			ret=self.writeSystemCron(cronArray,cronF)
 		else:
-			self.writeCron(cronArray)
-		return(True)
+			ret=self.writeCron(cronArray)
+		return(ret)
 	#def cronFromJson
 
 	def writeCron(self,cronArray):
+		ret=False
 		(f,cronFile)=tempfile.mkstemp()
 		with open(cronFile,"w") as fh:
 			for line in cronArray:
 				if len(line.strip())>0:
 					fh.writelines("{}\n".format(line))
 		cmd=["/usr/bin/crontab",cronFile]
-		subprocess.run(cmd)
+		try:
+			proc=subprocess.run(cmd)
+			if proc.returncode==0:
+				ret=True
+		except Exception as e:
+			print(repr(e))
+			print(cmd)
+			ret=False
+		return(ret)
 	#def writeCron
 
 	def writeSystemCron(self,cronArray,cronF):
+		ret=False
 		(f,cronTmp)=tempfile.mkstemp()
 		with open(cronTmp,"w") as fh:
 			for line in cronArray:
@@ -280,10 +291,14 @@ class TaskScheduler():
 		cronF=self._getCronPath(cronF)
 		cmd=["pkexec","rsync",cronTmp,cronF,"--usermap=*:root"]
 		try:
-			subprocess.run(cmd)
+			proc=subprocess.run(cmd)
+			if proc.returncode==0:
+				ret=True
 		except Exception as e:
 			print(repr(e))
 			print(cmd)
+			ret=False
+		return(ret)
 	#def writeSystemCron
 
 	def removeFromCron(self,schedcmd,cronArray=[]):
