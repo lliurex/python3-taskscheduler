@@ -1,3 +1,9 @@
+python3-taskscheduler (3.1.1-0lliurex23) jammy; urgency=medium
+
+  * Add support for cron fields in the form of x-y/z (range with interval)
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 06 Feb 2024 10:24:29 +0100
+
 python3-taskscheduler (3.1.0-0lliurex23) jammy; urgency=medium
 
   * Add return status for cronfromjson
