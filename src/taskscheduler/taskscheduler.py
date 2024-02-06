@@ -220,7 +220,17 @@ class TaskScheduler():
 		for data in cronData.split(","):
 			if "-" in data:
 				rangedata=data.split("-")
-				for i in range(int(rangedata[0]),int(rangedata[-1])+1):
+				print(cronData)
+				#Simply generate lines for range.
+				#1-10 = 1 line with 1, 1 line with 2...etc..
+				#1-10/2= From 1 to 10 each 2 minutes
+				#jump=2
+				#1 line with 1 jump, 1 line with 2 + jump
+				jump=1
+				rlimit=rangedata[-1]
+				if rlimit.isdigit()==False:
+					(rlimit,jump)=rangedata[-1].split("/")
+				for i in range(int(rangedata[0]),int(rlimit)+1,int(jump)):
 					selectedData.append(str(i))
 			elif data.isdigit():
 				selectedData.append(data)
