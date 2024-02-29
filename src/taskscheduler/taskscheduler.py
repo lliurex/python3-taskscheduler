@@ -115,6 +115,7 @@ class TaskScheduler():
 	def _getRestTime(self,timeAt):
 		now=datetime.datetime.now()	
 		(mon,dom,h,m)=int(timeAt[6:8]),int(timeAt[9:11]),int(timeAt[0:2]),int(timeAt[3:5])
+		epoch=now.timestamp()
 		try:
 			epoch=datetime.datetime(now.year,mon,dom,h,m).timestamp()
 		except Exception as e:
