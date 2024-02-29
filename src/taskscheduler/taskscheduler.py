@@ -115,11 +115,14 @@ class TaskScheduler():
 	def _getRestTime(self,timeAt):
 		now=datetime.datetime.now()	
 		(mon,dom,h,m)=int(timeAt[6:8]),int(timeAt[9:11]),int(timeAt[0:2]),int(timeAt[3:5])
+		epoch=now.timestamp()
 		try:
 			epoch=datetime.datetime(now.year,mon,dom,h,m).timestamp()
 		except Exception as e:
 			print(e)
 			print("m: {0} H: {1} D: {2} M: {3}".format(m,h,dom,mon))
+			epoch=datetime.datetime(now.year,mon+1,1,h,m).timestamp()
+
 			
 		if int(epoch)<int(now.timestamp()):
 			epoch=datetime.datetime(now.year+1,mon,dom,h,m).timestamp()
@@ -220,7 +223,17 @@ class TaskScheduler():
 		for data in cronData.split(","):
 			if "-" in data:
 				rangedata=data.split("-")
-				for i in range(int(rangedata[0]),int(rangedata[-1])+1):
+				print(cronData)
+				#Simply generate lines for range.
+				#1-10 = 1 line with 1, 1 line with 2...etc..
+				#1-10/2= From 1 to 10 each 2 minutes
+				#jump=2
+				#1 line with 1 jump, 1 line with 2 + jump
+				jump=1
+				rlimit=rangedata[-1]
+				if rlimit.isdigit()==False:
+					(rlimit,jump)=rangedata[-1].split("/")
+				for i in range(int(rangedata[0]),int(rlimit)+1,int(jump)):
 					selectedData.append(str(i))
 			elif data.isdigit():
 				selectedData.append(data)
@@ -231,10 +244,11 @@ class TaskScheduler():
 	#def _processCronField
 
 	def cronFromJson(self,data,orig="",cronF=""):
+		ret=False
 		if len(data)==0:
-			return(False)
+			return(ret)
 		if str(data[0].get("cmd",""))=="":
-			return(False)
+			return(ret)
 		root=" "
 		if len(cronF)>0:
 			root=" root "
@@ -254,23 +268,33 @@ class TaskScheduler():
 			else:
 				self.removeFromCron(orig,cronArray)
 		if len(cronF)>0:
-			self.writeSystemCron(cronArray,cronF)
+			ret=self.writeSystemCron(cronArray,cronF)
 		else:
-			self.writeCron(cronArray)
-		return(True)
+			ret=self.writeCron(cronArray)
+		return(ret)
 	#def cronFromJson
 
 	def writeCron(self,cronArray):
+		ret=False
 		(f,cronFile)=tempfile.mkstemp()
 		with open(cronFile,"w") as fh:
 			for line in cronArray:
 				if len(line.strip())>0:
 					fh.writelines("{}\n".format(line))
 		cmd=["/usr/bin/crontab",cronFile]
-		subprocess.run(cmd)
+		try:
+			proc=subprocess.run(cmd)
+			if proc.returncode==0:
+				ret=True
+		except Exception as e:
+			print(repr(e))
+			print(cmd)
+			ret=False
+		return(ret)
 	#def writeCron
 
 	def writeSystemCron(self,cronArray,cronF):
+		ret=False
 		(f,cronTmp)=tempfile.mkstemp()
 		with open(cronTmp,"w") as fh:
 			for line in cronArray:
@@ -280,10 +304,14 @@ class TaskScheduler():
 		cronF=self._getCronPath(cronF)
 		cmd=["pkexec","rsync",cronTmp,cronF,"--usermap=*:root"]
 		try:
-			subprocess.run(cmd)
+			proc=subprocess.run(cmd)
+			if proc.returncode==0:
+				ret=True
 		except Exception as e:
 			print(repr(e))
 			print(cmd)
+			ret=False
+		return(ret)
 	#def writeSystemCron
 
 	def removeFromCron(self,schedcmd,cronArray=[]):
@@ -330,7 +358,7 @@ class TaskScheduler():
 		cmd="atq"
 		cmdOutput=subprocess.check_output(cmd).decode()
 		days=["mon","tue","wed","thu","fri","sat","sun"]
-		months=["gen","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+		months=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
 		for line in cmdOutput.split("\n"):
 			line=' '.join(line.split())
 			if len(line)>0:
