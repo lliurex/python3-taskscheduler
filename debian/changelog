@@ -1,3 +1,10 @@
+python3-taskscheduler (3.0-0lliurex21) focal; urgency=medium
+
+  * Sync with jammy
+  * Fix leap years
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 29 Feb 2024 10:08:09 +0100
+
 python3-taskscheduler (2.9.9) focal-updates; urgency=medium
 
   * Splitted from taskscheduler
