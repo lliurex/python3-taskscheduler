@@ -120,6 +120,8 @@ class TaskScheduler():
 		except Exception as e:
 			print(e)
 			print("m: {0} H: {1} D: {2} M: {3}".format(m,h,dom,mon))
+			epoch=datetime.datetime(now.year,mon+1,1,h,m).timestamp()
+
 			
 		if int(epoch)<int(now.timestamp()):
 			epoch=datetime.datetime(now.year+1,mon,dom,h,m).timestamp()
