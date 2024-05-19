@@ -11,7 +11,7 @@ USERNOTALLOWED_ERROR=-10
 class TaskScheduler():
 	def __init__(self):
 		super(TaskScheduler, self).__init__()
-		self.dbg=True
+		self.dbg=False
 	#def __init__
 
 	def _debug(self,msg):
@@ -97,7 +97,12 @@ class TaskScheduler():
 		for line in rawCron:
 			user=""
 			line=" ".join(line.split())
-			(m,h,dom,mon,dow)=line.split(" ")[0:5]
+			if line.startswith("@"):
+				cmd=line
+				tdate=datetime.datetime.today() + datetime.timedelta(days=1)
+				(m,h,dom,mon,dow)=(tdate.minute,tdate.hour,tdate.day,tdate.month,tdate.weekday())
+			else:
+				(m,h,dom,mon,dow)=line.split(" ")[0:5]
 			timeAt=self._getTimeAtForTask(m,h,dom,mon,dow)
 			if len(cronF)>0:
 				user=line.split(" ")[5]
@@ -106,6 +111,7 @@ class TaskScheduler():
 				cmd=" ".join(line.split(" ")[5:])
 			restseconds=self._getRestTime(timeAt)
 			rest=str(datetime.timedelta(seconds=restseconds))
+			#Ensure restseconds is unique
 			while restseconds in cron.keys():
 				restseconds+=1
 			cron[restseconds]={"next":timeAt,"epoch":int(datetime.datetime.now().timestamp()),"user":user,"rest":rest,"cmd":cmd,"raw":line,"file":cronF}
@@ -162,6 +168,8 @@ class TaskScheduler():
 		sw=False
 		inc=1
 		for line in lines:
+			if isinstance(line,str):
+				continue
 			if line>nextTime:
 				inc=0
 				nextTime=line
@@ -197,7 +205,7 @@ class TaskScheduler():
 				sw=True
 				break
 
-		if sw==False:
+		if sw==False and len(lines)>0:
 			nextDate=lines[0]
 		return(str(nextDate))
 	#def _getNextDate
@@ -206,15 +214,18 @@ class TaskScheduler():
 		(data1,data2)=raw.split(":")
 		now1=first
 		now2=first
+		lines=[]
 		if not(isinstance(now,int)):
 			(now1,now2)=now.split(":")
 
-		selectedData=self._processCronField(data1,first,last,current=now1)
-		lines=[]
-		for data in selectedData:
-			selectedData2=self._processCronField(data2,first,last2)
-			for item in selectedData2:
-				lines.append(int("{0}{1}".format(data.zfill(2),str(item).zfill(2))))
+		if "@" in raw:
+			lines.append(data1)
+		else:
+			selectedData=self._processCronField(data1,first,last,current=now1)
+			for data in selectedData:
+				selectedData2=self._processCronField(data2,first,last2)
+				for item in selectedData2:
+					lines.append(int("{0}{1}".format(data.zfill(2),str(item).zfill(2))))
 		return(lines)
 	#def _expandCronRegex
 
@@ -223,7 +234,6 @@ class TaskScheduler():
 		for data in cronData.split(","):
 			if "-" in data:
 				rangedata=data.split("-")
-				print(cronData)
 				#Simply generate lines for range.
 				#1-10 = 1 line with 1, 1 line with 2...etc..
 				#1-10/2= From 1 to 10 each 2 minutes
