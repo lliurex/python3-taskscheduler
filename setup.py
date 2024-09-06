@@ -16,33 +16,4 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from distutils.core import setup
-
-if __name__ == '__main__':
-
-    setup(name='python3-taskscheduler',
-        version='2.9',
-        description='module for cron',
-        long_description="""""",
-        author='Lliurex Team',
-        author_email='juanma1980@gmail.com',
-        maintainer='Juanma Navarro',
-        maintainer_email='juanma1980@gmail.com',
-        keywords=['software','desktop'],
-        url='http://www.lliurex.net',
-        license='GPL',
-        platforms='UNIX',
-#        scripts = [''],
-        package_dir = {'':'src'},
-        packages = ['taskscheduler'],
-        data_files = [],
-        classifiers=[
-                'Development Status :: 4 - Beta',
-                'Environment :: Desktop'
-                'Intended Audience :: End Users',
-                'License :: OSI Approved :: GNU General Public License v3',
-                'Operating System :: POSIX',
-                'Programming Language :: Python',
-                'Topic :: Desktop files',
-                ],
-    )
-
+setup()
