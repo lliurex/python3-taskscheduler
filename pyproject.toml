@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name='taskscheduler'
-version="0.4"
+version="3.3"
 description='module for scheduling tasks with cron or at'
 authors=[
   {name='Lliurex Team'},
