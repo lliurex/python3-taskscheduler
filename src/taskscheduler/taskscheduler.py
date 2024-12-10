@@ -246,7 +246,8 @@ class TaskScheduler():
 				for i in range(int(rangedata[0]),int(rlimit)+1,int(jump)):
 					selectedData.append(str(i))
 			elif data.isdigit():
-				selectedData.append(data)
+				#Ensure there are no leading 0 while "0" itself is preserved
+				selectedData.append(str(int(data)))
 			elif data=="*":
 				for i in range(first,int(last)+first):
 					selectedData.append(str(i))
