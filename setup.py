@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 #
-#    Copyright (C) 2023 LliureX Team 
+# $Id: setup.py,v 1.32 2010/10/17 15:47:21 ghantoos Exp $
+#
+#    Copyright (C) 2008-2009  Ignace Mouzannar (ghantoos) <ghantoos@ghantoos.org>
+#
+#    This file is part of lshell
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -20,8 +24,8 @@ from distutils.core import setup
 if __name__ == '__main__':
 
     setup(name='python3-taskscheduler',
-        version='2.9',
-        description='module for cron',
+        version='3.3.1',
+        description='Lliurex cron and at manager',
         long_description="""""",
         author='Lliurex Team',
         author_email='juanma1980@gmail.com',
@@ -37,7 +41,7 @@ if __name__ == '__main__':
         data_files = [],
         classifiers=[
                 'Development Status :: 4 - Beta',
-                'Environment :: Desktop'
+                'Environment :: Console'
                 'Intended Audience :: End Users',
                 'License :: OSI Approved :: GNU General Public License v3',
                 'Operating System :: POSIX',
