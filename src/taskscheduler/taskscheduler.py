@@ -39,6 +39,7 @@ class TaskScheduler():
 			cmdOutput=[]
 		cmdOutput="".join(cmdOutput)
 		cmdOutput=cmdOutput.split("\n")
+		cmdOutput=[l.strip() for l in cmdOutput]
 		return(cmdOutput)
 	#def _getRawUserCron
 
