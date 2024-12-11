@@ -434,10 +434,11 @@ class TaskScheduler():
 			cmdEcho = subprocess.Popen(('echo', task), stdout=subprocess.PIPE)
 		except:
 			ret=False
-		try:
-			output = subprocess.check_output(cmd, stdin=cmdEcho.stdout)
-		except:
-			ret=False
+		else:
+			try:
+				output = subprocess.check_output(cmd, stdin=cmdEcho.stdout)
+			except:
+				ret=False
 		cmdEcho.wait()
 		return(ret)
 	#def addToAt
