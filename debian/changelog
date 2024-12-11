@@ -1,6 +1,7 @@
 python3-taskscheduler (3.3.1-0llx23) jammy; urgency=medium
 
   * FIX: Process all cron numeric values as int
+  * FIX: Trim all strings
 
  -- Juanma1980 <juanma1980@gmail.com>  Tue, 10 Dec 2024 10:08:10 +0100
 
