@@ -154,11 +154,14 @@ class TaskScheduler():
 			for i in range(0,lenDays):
 				dowDays.append(str(int(dowDays[i])+7))
 			nowDow=now.weekday()+1
-			if str(nowDow) not in dowDays:
-				for d in dowDays:
-					if str(nowDow)<=d:
-						inc+=int(d)-int(nowDow)
-						break
+			for d in dowDays:
+				if str(nowDow)<=d:
+					incDays=int(d)-int(nowDow)
+					if incDays==0 and inc==1:
+						inc=7
+					else:
+						inc=incDays
+					break
 		nextDate=self._getNextDate(rawDate,nowDate,inc).zfill(4)
 		compDate="{}{}".format(nowDate.split(":")[0].zfill(2),nowDate.split(":")[1].zfill(2))
 		if nextDate!=compDate:
