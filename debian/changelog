@@ -1,6 +1,7 @@
-python3-taskscheduler (3.3-0lliurex25) noble; urgency=medium
+python3-taskscheduler (3.3-1lliurex25) noble; urgency=medium
 
   * Noble release
+  * honor DOW for next launch
 
  -- Juanma1980 <juanma1980@gmail.com>  Fri, 06 Sep 2024 10:40:54 +0200
 
