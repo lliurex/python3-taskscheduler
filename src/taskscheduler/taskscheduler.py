@@ -136,13 +136,29 @@ class TaskScheduler():
 	#def _getRestTime
 
 	def _getTimeAtForTask(self,m,h,dom,mon,dow):
+		inc=0
 		rawTime="{0}:{1}".format(h,m)
 		rawDate="{0}:{1}".format(mon,dom)
 		now = datetime.datetime.now()
 		nowTime="{0}:{1}".format(now.hour,now.minute)
 		nowDate="{0}:{1}".format(now.month,now.day)
+		dowDays=self._processCronField(dow,0,7)
 		(nextTime,inc)=self._getNextTime(rawTime,nowTime)
 		nextTime=nextTime.zfill(4)
+		#If DOW calculate it after time inc
+		if len(dowDays)!=7:
+			if "7" in dowDays:
+				dowDays.remove("7")
+				dowDays.insert(0,"0")
+			lenDays=len(dowDays)
+			for i in range(0,lenDays):
+				dowDays.append(str(int(dowDays[i])+7))
+			nowDow=now.weekday()+1
+			if str(nowDow) not in dowDays:
+				for d in dowDays:
+					if str(nowDow)<=d:
+						inc+=int(d)-int(nowDow)
+						break
 		nextDate=self._getNextDate(rawDate,nowDate,inc).zfill(4)
 		compDate="{}{}".format(nowDate.split(":")[0].zfill(2),nowDate.split(":")[1].zfill(2))
 		if nextDate!=compDate:
