@@ -1,3 +1,10 @@
+python3-taskscheduler (3.3.2-0llx23) jammy; urgency=medium
+
+  * Add support for leap years
+  * FIX: Bad calculation of current month for next execution
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 28 Jan 2026 10:49:12 +0100
+
 python3-taskscheduler (3.3.1-0llx23) jammy; urgency=medium
 
   * FIX: Process all cron numeric values as int
