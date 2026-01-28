@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os,sys,shutil
 import re
-import datetime
+import datetime,calendar
 import subprocess
 import tempfile
 
@@ -199,16 +199,20 @@ class TaskScheduler():
 	#def _getNextTime(self,raw,now):
 
 	def _getNextDate(self,raw,now,inc=0):
-		maxdom=0
+		maxdom=31
 		(m,d)=now.split(":")
 		m=int(m)
 		d=int(d)+inc
-		if m%2==0 or m==7:
-			maxdom=31
-		elif m!=1:
+		if m==2:
+			year=datetime.datetime.now().year
+			if calendar.isleap(year)==True:
+				maxdom=29
+			else:
+				maxdom=28
+		elif m%2==0 and m<8:
 			maxdom=30
-		else:
-			maxdom=28
+		elif m%2!=0 and m>=8:
+			maxdom=30
 		if d>maxdom:
 			d=1
 			m+=1
